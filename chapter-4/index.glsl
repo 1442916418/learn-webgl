@@ -89,6 +89,13 @@ float opSmoothSubtraction(float d1,float d2,float k){
   return mix(d2,-d1,h)+k*h*(1.-h);
 }
 
+// 极坐标
+vec2 cart2polar(vec2 uv){
+  float phi=atan(uv.y,uv.x);
+  float r=length(uv);
+  return vec2(phi,r);
+}
+
 void mainImage(out vec4 fragColor,in vec2 fragCoord){
   // 用输入坐标 fragCoord 除以画布大小 iResolution.xy，
   // 我们就能得到一个归一化的坐标，把它命名为 uv
@@ -97,8 +104,9 @@ void mainImage(out vec4 fragColor,in vec2 fragCoord){
   // 重复
   // uv=fract(uv*vec2(2.,2.));
   
-  // uv=(uv-.5)*2.;
-  // uv.x*=iResolution.x/iResolution.y;
+  // uv 居中处理
+  uv=(uv-.5)*2.;
+  uv.x*=iResolution.x/iResolution.y;
   
   // ------------------------ uv 坐标 ------------------------
   // x 坐标的分布情况
@@ -282,14 +290,40 @@ void mainImage(out vec4 fragColor,in vec2 fragCoord){
   // fragColor=vec4(c,1.);
   
   // 网格
-  uv=fract(uv*16.);
+  // uv=fract(uv*16.);
   
   // x
   // vec3 c=vec3(step(.25,uv.x));
   // y
-  vec3 c=vec3(step(.25,uv.y));
-  fragColor=vec4(c,1.);
+  // vec3 c=vec3(step(.25,uv.y));
+  // fragColor=vec4(c,1.);
   
-  // TODO:  用布尔运算里的“并”操作，将这 2 种图形合并。
+  // 用布尔运算里的“并”操作，将这 2 种图形合并。
+  // uv.x*=iResolution.x/iResolution.y;
+  
+  // vec3 c=vec3(opUnion(step(.25,uv.x),step(.25,uv.y)));
+  // fragColor=vec4(c,1.);
+  
+  // // 圆形
+  // float d=sdCircle(uv,.5);
+  // // 波纹
+  // d=sin(d*40.);
+  
+  // float mask=smoothstep(0.,.02,d);
+  // vec3 c=vec3(mask);
+  
+  // fragColor=vec4(c,1.);
+  
+  // ------------------------ 极坐标 ------------------------
+  uv=cart2polar(uv);
+  // fragColor=vec4(uv,0.,1.);
+  
+  // 放射型
+  // float c=sin(uv.x*12.);
+  // fragColor=vec4(vec3(c),1.);
+  
+  // 螺旋形
+  float c=sin(uv.y*20.+uv.x);
+  fragColor=vec4(vec3(c),1.);
   
 }
