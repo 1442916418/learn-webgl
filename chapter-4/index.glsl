@@ -1,112 +1,112 @@
-const float PI=3.14159265359;
+const float PI = 3.14159265359;
 
-#define mix(x,y,t)x*(1.-t)+y*t
+#define mix(x, y, t)x * (1.0 - t) + y*t
 
 // 长方形
-float sdBox(in vec2 p,in vec2 b)
+float sdBox(in vec2 p, in vec2 b)
 {
-  vec2 d=abs(p)-b;
-  return length(max(d,0.))+min(max(d.x,d.y),0.);
+  vec2 d = abs(p) - b;
+  return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
 }
 
 // 等边三角形函数
-float sdEquilateralTriangle(in vec2 p,in float r)
+float sdEquilateralTriangle(in vec2 p, in float r)
 {
-  const float k=sqrt(3.);
-  p.x=abs(p.x)-r;
-  p.y=p.y+r/k;
-  if(p.x+k*p.y>0.)p=vec2(p.x-k*p.y,-k*p.x-p.y)/2.;
-  p.x-=clamp(p.x,-2.*r,0.);
-  return-length(p)*sign(p.y);
+  const float k = sqrt(3.0);
+  p.x = abs(p.x) - r;
+  p.y = p.y + r /k;
+  if (p.x + k*p.y > 0.0)p = vec2(p.x - k*p.y, - k*p.x - p.y) / 2.0;
+  p.x -= clamp(p.x, - 2.0 * r, 0.0);
+  return - length(p) * sign(p.y);
 }
 
-mat2 rotation2d(float angle){
-  float s=sin(angle);
-  float c=cos(angle);
+mat2 rotation2d(float angle) {
+  float s = sin(angle);
+  float c = cos(angle);
   
   return mat2(
-    c,-s,
-    s,c
+    c, - s,
+    s, c
   );
 }
 
 // 旋转
-vec2 rotate(vec2 v,float angle){
-  return rotation2d(angle)*v;
+vec2 rotate(vec2 v, float angle) {
+  return rotation2d(angle) * v;
 }
 
 // 圆角
-float opRound(in float d,in float r)
+float opRound(in float d, in float r)
 {
-  return d-r;
+  return d - r;
 }
 
 // 镂空
-float opOnion(in float d,in float r)
+float opOnion(in float d, in float r)
 {
-  return abs(d)-r;
+  return abs(d) - r;
 }
 
 // 并
-float opUnion(float d1,float d2)
+float opUnion(float d1, float d2)
 {
-  return min(d1,d2);
+  return min(d1, d2);
 }
 
 // 交
-float opIntersection(float d1,float d2)
+float opIntersection(float d1, float d2)
 {
-  return max(d1,d2);
+  return max(d1, d2);
 }
 
 // 差
-float opSubtraction(float d1,float d2)
+float opSubtraction(float d1, float d2)
 {
-  return max(-d1,d2);
+  return max(-d1, d2);
 }
 
 // 圆形
-float sdCircle(vec2 p,float r)
+float sdCircle(vec2 p, float r)
 {
-  return length(p)-r;
+  return length(p) - r;
 }
 
 // 平滑版 - 并
-float opSmoothUnion(float d1,float d2,float k){
-  float h=clamp(.5+.5*(d2-d1)/k,0.,1.);
-  return mix(d2,d1,h)-k*h*(1.-h);
+float opSmoothUnion(float d1, float d2, float k) {
+  float h = clamp(0.5 + 0.5 * (d2 - d1) / k, 0.0, 1.0);
+  return mix(d2, d1, h) - k*h * (1.0 - h);
 }
 
 // 平滑版 - 交
-float opSmoothIntersection(float d1,float d2,float k){
-  float h=clamp(.5-.5*(d2-d1)/k,0.,1.);
-  return mix(d2,d1,h)+k*h*(1.-h);
+float opSmoothIntersection(float d1, float d2, float k) {
+  float h = clamp(0.5 - 0.5 * (d2 - d1) / k, 0.0, 1.0);
+  return mix(d2, d1, h) + k*h * (1.0 - h);
 }
 
 // 平滑版 - 差
-float opSmoothSubtraction(float d1,float d2,float k){
-  float h=clamp(.5-.5*(d2+d1)/k,0.,1.);
-  return mix(d2,-d1,h)+k*h*(1.-h);
+float opSmoothSubtraction(float d1, float d2, float k) {
+  float h = clamp(0.5 - 0.5 * (d2 + d1) / k, 0.0, 1.0);
+  return mix(d2, - d1, h) + k*h * (1.0 - h);
 }
 
 // 极坐标
-vec2 cart2polar(vec2 uv){
-  float phi=atan(uv.y,uv.x);
-  float r=length(uv);
-  return vec2(phi,r);
+vec2 cart2polar(vec2 uv) {
+  float phi = atan(uv.y, uv.x);
+  float r = length(uv);
+  return vec2(phi, r);
 }
 
-void mainImage(out vec4 fragColor,in vec2 fragCoord){
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
   // 用输入坐标 fragCoord 除以画布大小 iResolution.xy，
   // 我们就能得到一个归一化的坐标，把它命名为 uv
-  vec2 uv=fragCoord/iResolution.xy;
+  vec2 uv = fragCoord / iResolution.xy;
   
   // 重复
   // uv=fract(uv*vec2(2.,2.));
   
   // uv 居中处理
-  uv=(uv-.5)*2.;
-  uv.x*=iResolution.x/iResolution.y;
+  uv = (uv - 0.5) * 2.0;
+  uv.x *= iResolution.x / iResolution.y;
   
   // ------------------------ uv 坐标 ------------------------
   // x 坐标的分布情况
@@ -315,15 +315,15 @@ void mainImage(out vec4 fragColor,in vec2 fragCoord){
   // fragColor=vec4(c,1.);
   
   // ------------------------ 极坐标 ------------------------
-  uv=cart2polar(uv);
-  // fragColor=vec4(uv,0.,1.);
+  // uv=cart2polar(uv);
+  // // fragColor=vec4(uv,0.,1.);
   
-  // 放射型
-  // float c=sin(uv.x*12.);
+  // // 放射型
+  // // float c=sin(uv.x*12.);
+  // // fragColor=vec4(vec3(c),1.);
+  
+  // // 螺旋形
+  // float c=sin(uv.y*20.+uv.x);
   // fragColor=vec4(vec3(c),1.);
-  
-  // 螺旋形
-  float c=sin(uv.y*20.+uv.x);
-  fragColor=vec4(vec3(c),1.);
   
 }
