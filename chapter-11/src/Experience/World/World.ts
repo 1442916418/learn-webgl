@@ -14,12 +14,14 @@ export default class World extends kokomi.Component {
     this.testObject = null
 
     this.base.am.on('ready', () => {
-      // document.querySelector(".loader-screen")?.classList.add("hollow");
-      // const skybox = this.base.am.items["skybox"];
-      // skybox.mapping = THREE.EquirectangularReflectionMapping;
-      // // this.base.scene.background = skybox;
-      // this.testObject = new TestObject(this.base);
-      // this.testObject.addExisting();
+      document.querySelector('.loader-screen')?.classList.add('hollow')
+
+      const skybox = this.base.am.items['skybox']
+      skybox.mapping = THREE.EquirectangularReflectionMapping
+
+      this.base.scene.background = skybox
+      this.testObject = new TestObject(this.base)
+      this.testObject.addExisting()
     })
   }
 }
